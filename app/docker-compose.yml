@@ -1,0 +1,27 @@
+# Schema version, quyết định version của engine Docker build
+version: "3.7"
+# List container đc sử dụng trong app
+services:
+  app: # Tên container main của app, tự chọn, sẽ tự động trở thành 1 network alias
+    image: node:12-alpine  # Image môi trường để chạy app
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - 3000:3000
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment: # Các property của sql sẽ connect
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+      MYSQL_DB: todos
+  mysql: # Container mysql
+    image: mysql:5.7
+    volumes:
+      - todo-mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASES: todos
+
+volumes: # Cần declare các volume sẽ sử dụng, vì compose k tự create đc
+  todo-mysql-data:
