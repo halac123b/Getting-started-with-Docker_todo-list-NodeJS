@@ -1,12 +1,15 @@
-const express = require('express');
-const app = express();
-const db = require('./persistence');
-const getItems = require('./routes/getItems');
-const addItem = require('./routes/addItem');
-const updateItem = require('./routes/updateItem');
-const deleteItem = require('./routes/deleteItem');
+import express from 'express';
+import { init, teardown } from './persistence';
+import getItems from './routes/getItems';
+import addItem from './routes/addItem';
+import updateItem from './routes/updateItem';
+import deleteItem from './routes/deleteItem';
 
+const app = express();
+// Apply middleware to incoming requests, k chỉ định path nào thì sẽ áp dụng cho tất cả
+/// json(): parse json string từ body của request thành object
 app.use(express.json());
+
 app.use(express.static(__dirname + '/static'));
 
 app.get('/items', getItems);
@@ -14,7 +17,7 @@ app.post('/items', addItem);
 app.put('/items/:id', updateItem);
 app.delete('/items/:id', deleteItem);
 
-db.init().then(() => {
+init().then(() => {
     app.listen(3000, () => console.log('Listening on port 3000'));
 }).catch((err) => {
     console.error(err);
@@ -22,8 +25,8 @@ db.init().then(() => {
 });
 
 const gracefulShutdown = () => {
-    db.teardown()
-        .catch(() => {})
+    teardown()
+        .catch(() => { })
         .then(() => process.exit());
 };
 
